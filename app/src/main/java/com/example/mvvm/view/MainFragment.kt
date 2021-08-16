@@ -15,6 +15,7 @@ import com.example.mvvm.R
 import com.example.mvvm.adapter.ProductAdapter
 import com.example.mvvm.model.Product
 import com.example.mvvm.view_model.MainViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class MainFragment : Fragment(R.layout.main_fragment) {
 
@@ -26,11 +27,14 @@ class MainFragment : Fragment(R.layout.main_fragment) {
     private lateinit var productsRecyclerView: RecyclerView
     private val adapter = ProductAdapter(mutableListOf())
 
-    private val productsObserver = Observer<List<Product>>{ newList ->
+    private val productsObserver = Observer<List<Product>> { newList ->
         adapter.refresh(newList)
 
     }
 
+    private val errorObserver = Observer<String> { error ->
+        Snackbar.make(requireView(), error, Snackbar.LENGTH_LONG).show()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -41,6 +45,7 @@ class MainFragment : Fragment(R.layout.main_fragment) {
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.products.observe(viewLifecycleOwner, productsObserver)
+        viewModel.error.observe(viewLifecycleOwner, errorObserver)
         viewModel.fetchProdutos()
     }
 
